@@ -22,7 +22,4 @@ public class Restaurant {
     @JoinColumn(name = "restaurant_owner_id")
     private RestaurantOwner restaurantOwner;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RestaurantMenuItem> menu;
 }
-

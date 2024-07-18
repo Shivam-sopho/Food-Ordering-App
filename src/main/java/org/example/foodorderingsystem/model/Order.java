@@ -2,6 +2,7 @@ package org.example.foodorderingsystem.model;
 
 
 import lombok.Data;
+import lombok.ToString;
 import org.example.foodorderingsystem.model.enums.OrderStatus;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "order")
 @Data
 public class Order {
     @Id
@@ -19,6 +20,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> items;
 

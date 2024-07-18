@@ -23,7 +23,7 @@ public class EntityToDTOMapper {
         dto.setMaxCapacity(restaurant.getMaxCapacity());
         dto.setCurrentCapacity(restaurant.getCurrentCapacity());
         dto.setRating(restaurant.getRating());
-        dto.setMenu(restaurant.getMenu().stream().map(EntityToDTOMapper::toRestaurantMenuItemDTO).collect(Collectors.toList()));
+        //dto.setMenu(restaurant.getMenu().stream().map(EntityToDTOMapper::toRestaurantMenuItemDTO).collect(Collectors.toList()));
         return dto;
     }
 

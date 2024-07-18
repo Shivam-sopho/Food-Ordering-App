@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ public RestaurantDTO registerRestaurant(String ownerUsername, RestaurantDTO rest
             })
             .collect(Collectors.toList());
 
-    restaurant.setMenu(restaurantMenuItems);
+    //restaurant.setMenu(restaurantMenuItems);
     restaurant = restaurantRepository.save(restaurant);
 
     return EntityToDTOMapper.toRestaurantDTO(restaurant);
@@ -126,9 +127,10 @@ public RestaurantDTO registerRestaurant(String ownerUsername, RestaurantDTO rest
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
         List<OrderItem> orderItems = orderItemRepository.findByRestaurantMenuItem_Restaurant_Id(restaurantId);
-        List<Order> orders = orderItems.stream().map(OrderItem::getOrder).distinct().collect(Collectors.toList());
+     //   List<Order> orders = orderItems.stream().map(OrderItem::getOrder).distinct().collect(Collectors.toList());
 
-        return orders.stream().map(EntityToDTOMapper::toOrderDTO).collect(Collectors.toList());
+       // return orders.stream().map(EntityToDTOMapper::toOrderDTO).collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     public List<OrderItemDTO> getOrderItemsByRestaurant(Long restaurantId) {

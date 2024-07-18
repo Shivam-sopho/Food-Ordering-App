@@ -66,6 +66,7 @@ public class OrderService {
         }
 
         Order order = new Order();
+        order.setId(orderDTO.getId());
         order.setCustomerId(orderDTO.getCustomerId());
         order.setStatus(OrderStatus.PROCESSED);
 
@@ -88,6 +89,7 @@ public class OrderService {
                 restaurantMenuItemRepository.save(restaurantMenuItem);
 
                 OrderItem orderItem = new OrderItem();
+                orderItem.setId(restaurantMenuItem.getId());
                 orderItem.setRestaurantMenuItem(restaurantMenuItem);
                 orderItem.setQuantity(quantityToTake);
                 orderItem.setOrder(order);
@@ -101,7 +103,7 @@ public class OrderService {
                 throw new BadRequestException("Unable to fulfill the requested quantity for item ID " + itemDTO.getRestaurantMenuItemId());
             }
         }
-
+        order.setId(orderDTO.getId());
         order.setItems(orderItems);
         Order savedOrder = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
