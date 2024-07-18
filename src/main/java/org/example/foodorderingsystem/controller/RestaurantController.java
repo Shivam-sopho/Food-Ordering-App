@@ -16,12 +16,12 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    @PostMapping("/register")
+    @PostMapping("/register/{username}")
     public RestaurantDTO registerRestaurant(@PathVariable String username,@RequestBody RestaurantDTO restaurantDTO) {
         return restaurantService.registerRestaurant(username,restaurantDTO);
     }
 
-    @PutMapping("/{restaurantId}/update")
+    @PutMapping("/{restaurantId}/{username}/update")
     public RestaurantDTO updateRestaurant(@PathVariable String username,@PathVariable Long restaurantId, @RequestBody RestaurantDTO restaurantDTO) {
         return restaurantService.updateRestaurant(username,restaurantId, restaurantDTO);
     }

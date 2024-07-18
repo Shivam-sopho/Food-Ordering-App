@@ -3,9 +3,11 @@ package org.example.foodorderingsystem.service;
 import org.example.foodorderingsystem.dtos.OrderDTO;
 import org.example.foodorderingsystem.dtos.OrderItemDTO;
 import org.example.foodorderingsystem.dtos.RestaurantDTO;
+import org.example.foodorderingsystem.dtos.RestaurantMenuItemDTO;
 import org.example.foodorderingsystem.event.OrderEvent;
 import org.example.foodorderingsystem.exceptions.BadRequestException;
 import org.example.foodorderingsystem.exceptions.ResourceNotFoundException;
+import org.example.foodorderingsystem.mapper.DTOToEntityMapper;
 import org.example.foodorderingsystem.mapper.EntityToDTOMapper;
 import org.example.foodorderingsystem.model.*;
 import org.example.foodorderingsystem.repository.OrderItemRepository;
@@ -32,28 +34,45 @@ public class RestaurantService {
 
     @Autowired UserService userService;
 
+    @Autowired MenuItemService menuItemService;
+
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    public RestaurantDTO registerRestaurant(String ownerUsername, RestaurantDTO restaurantDTO) {
-        User owner = userService.findUserByUsername(ownerUsername)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+@Transactional
+public RestaurantDTO registerRestaurant(String ownerUsername, RestaurantDTO restaurantDTO) {
+    User owner = userService.findUserByUsername(ownerUsername)
+            .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
 
-        if (!(owner instanceof RestaurantOwner)) {
-            throw new BadRequestException("User is not authorized to register a restaurant");
-        }
-
-        Restaurant restaurant = new Restaurant();
-        restaurant.setName(restaurantDTO.getName());
-        restaurant.setAddress(restaurantDTO.getAddress());
-        restaurant.setMaxCapacity(restaurantDTO.getMaxCapacity());
-        restaurant.setCurrentCapacity(0);
-        restaurant.setRestaurantOwner((RestaurantOwner) owner);
-        restaurant = restaurantRepository.save(restaurant);
-        return EntityToDTOMapper.toRestaurantDTO(restaurant);
+    if (!(owner instanceof RestaurantOwner)) {
+        throw new BadRequestException("User is not authorized to register a restaurant");
     }
 
+    Restaurant restaurant = new Restaurant();
+    restaurant.setName(restaurantDTO.getName());
+    restaurant.setAddress(restaurantDTO.getAddress());
+    restaurant.setMaxCapacity(restaurantDTO.getMaxCapacity());
+    restaurant.setCurrentCapacity(0);
+    restaurant = restaurantRepository.save(restaurant);
+
+    Restaurant finalRestaurant = restaurant;
+    List<RestaurantMenuItem> restaurantMenuItems = restaurantDTO.getMenu().stream()
+            .map(restaurantMenuItemDTO -> {
+                MenuItem menuItem = menuItemService.getMenuItem(restaurantMenuItemDTO.getMenuItemId());
+                RestaurantMenuItem restaurantMenuItem = new RestaurantMenuItem();
+                restaurantMenuItem.setMenuItem(menuItem);
+                restaurantMenuItem.setRestaurant(finalRestaurant);
+                restaurantMenuItem.setPrice(restaurantMenuItemDTO.getPrice());
+                restaurantMenuItem.setAvailableQuantity(restaurantMenuItem.getAvailableQuantity());
+                return restaurantMenuItem;
+            })
+            .collect(Collectors.toList());
+
+    restaurant.setMenu(restaurantMenuItems);
+    restaurant = restaurantRepository.save(restaurant);
+
+    return EntityToDTOMapper.toRestaurantDTO(restaurant);
+}
     @Transactional
     public RestaurantDTO updateRestaurant(String ownerUsername, Long restaurantId, RestaurantDTO restaurantDTO) {
         User owner = userService.findUserByUsername(ownerUsername)
